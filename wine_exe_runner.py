@@ -4,17 +4,16 @@ import shutil
 import subprocess
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
                              QLineEdit, QPushButton, QFileDialog, QLabel, QTabWidget, QMessageBox)
-import subprocess
-import xml.etree.ElementTree as ET
+
 
 def check_dependencies():
     """
-    التحقق من وجود جميع المتطلبات الضرورية للتطبيق
+    Check all necessary requirements for the application
     
     Returns:
-        tuple: (bool, str) - حالة التحقق، ورسالة الخطأ إن وجدت
+        tuple: (bool, str) - Check status, and error message if any
     """
-    # قائمة المتطلبات للتحقق
+    # List of dependencies to check
     dependencies = [
         ('wine', 'Wine'),
         ('python3', 'Python 3'),
@@ -28,15 +27,15 @@ def check_dependencies():
         if not shutil.which(cmd):
             missing_deps.append(name)
     
-    # التحقق من وجود PyQt5
+    # Check PyQt5 availability
     try:
         import PyQt5
     except ImportError:
         missing_deps.append('PyQt5')
     
-    # إذا كانت هناك متطلبات مفقودة
+    # If there are missing dependencies
     if missing_deps:
-        error_message = "المتطلبات التالية مفقودة:\n" + "\n".join(missing_deps)
+        error_message = "The following requirements are missing:\n" + "\n".join(missing_deps)
         return False, error_message
     
     return True, ""
@@ -45,28 +44,28 @@ class WineExeRunner(QWidget):
     def __init__(self):
         super().__init__()
         
-        # التحقق من المتطلبات قبل تشغيل التطبيق
+        # Check requirements before running the application
         dependencies_ok, error_message = check_dependencies()
         if not dependencies_ok:
-            # إنشاء مربع رسائل مع زر لفتح ملف المتطلبات
+            # Create message box with button to open requirements
             msg_box = QMessageBox()
             msg_box.setIcon(QMessageBox.Critical)
-            msg_box.setWindowTitle("خطأ في المتطلبات")
+            msg_box.setWindowTitle("Dependencies Error")
             msg_box.setText(error_message)
             
-            # إضافة زر لفتح ملف المتطلبات
-            open_req_button = msg_box.addButton("فتح ملف المتطلبات", QMessageBox.ActionRole)
+            # Add button to open requirements file
+            open_req_button = msg_box.addButton("Open Requirements File", QMessageBox.ActionRole)
             cancel_button = msg_box.addButton(QMessageBox.Cancel)
             
-            # تنفيذ مربع الرسائل
+            # Execute message box
             msg_box.exec_()
             
-            # التحقق من الزر الذي تم الضغط عليه
+            # Check which button was pressed
             if msg_box.clickedButton() == open_req_button:
-                # فتح ملف المتطلبات
+                # Open requirements file
                 requirements_path = os.path.join(os.path.dirname(__file__), 'requirements.txt')
                 
-                # محاولة فتح الملف باستخدام الأمر الافتراضي للنظام
+                # Try to open file using system default
                 try:
                     if sys.platform.startswith('darwin'):
                         subprocess.run(['open', requirements_path], check=True)
@@ -75,147 +74,147 @@ class WineExeRunner(QWidget):
                     else:  # linux
                         subprocess.run(['xdg-open', requirements_path], check=True)
                 except Exception as e:
-                    QMessageBox.warning(None, "خطأ", f"تعذر فتح ملف المتطلبات: {str(e)}")
+                    QMessageBox.warning(None, "Error", f"Could not open requirements file: {str(e)}")
             
-            # إنهاء البرنامج
+            # Exit the program
             sys.exit(1)
         
         self.initUI()
-    
+
     def initUI(self):
-        # تعيين العنوان والحجم
+        # Set title and size
         self.setWindowTitle('AZERTY EXE Runner')
         self.setGeometry(300, 300, 600, 300)
         
-        # إنشاء تبويب رئيسي
+        # Create main tab
         self.tabs = QTabWidget()
         
-        # إنشاء التبويبات
+        # Create tabs
         self.tab1 = QWidget()
         self.tab2 = QWidget()
         
-        # إضافة التبويبات
+        # Add tabs
         self.tabs.addTab(self.tab1, "Downloads EXE")
         self.tabs.addTab(self.tab2, "Wine 32bit Apps")
         
-        # إعداد التبويب الأول
+        # Setup first tab
         self.setup_first_tab()
         
-        # إعداد التبويب الثاني
+        # Setup second tab
         self.setup_second_tab()
         
-        # تخطيط رئيسي
+        # Main layout
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.tabs)
         
-        # تعيين التخطيط
+        # Set layout
         self.setLayout(main_layout)
     
     def setup_first_tab(self):
-        # إنشاء تخطيط رأسي للتبويب الأول
+        # Create vertical layout for first tab
         layout = QVBoxLayout()
         
-        # إنشاء تخطيط أفقي للمسار وزر التصفح
+        # Create horizontal layout for path and browse button
         path_layout = QHBoxLayout()
         
-        # مساحة إدخال المسار مع المسار الافتراضي
+        # Path input with default path
         self.path_input1 = QLineEdit()
         default_path = os.path.expanduser('~/Downloads')
         self.path_input1.setText(default_path)
         path_layout.addWidget(self.path_input1)
         
-        # زر التصفح
+        # Browse button
         browse_btn1 = QPushButton('Browse')
         browse_btn1.clicked.connect(lambda: self.browse_file(self.path_input1))
         path_layout.addWidget(browse_btn1)
         
-        # إضافة تخطيط المسار للتخطيط الرئيسي
+        # Add path layout to main layout
         layout.addLayout(path_layout)
         
-        # زر التشغيل
+        # Run button
         run_btn1 = QPushButton('Run')
         run_btn1.clicked.connect(lambda: self.run_exe(self.path_input1))
         layout.addWidget(run_btn1)
         
-        # منطقة عرض النتائج
-        self.result_label1 = QLabel('النتائج ستظهر هنا')
+        # Result label
+        self.result_label1 = QLabel('Results will appear here')
         layout.addWidget(self.result_label1)
         
-        # تعيين التخطيط للتبويب الأول
+        # Set layout for first tab
         self.tab1.setLayout(layout)
     
     def setup_second_tab(self):
-        # إنشاء تخطيط رأسي للتبويب الثاني
+        # Create vertical layout for second tab
         layout = QVBoxLayout()
         
-        # إنشاء تخطيط أفقي للمسار وزر التصفح
+        # Create horizontal layout for path and browse button
         path_layout = QHBoxLayout()
         
-        # مساحة إدخال المسار مع المسار الافتراضي لتطبيقات Wine 32bit
+        # Path input with default path for Wine 32bit apps
         self.path_input2 = QLineEdit()
         default_path = os.path.expanduser('~/.wine/drive_c/Program Files (x86)')
         self.path_input2.setText(default_path)
         path_layout.addWidget(self.path_input2)
         
-        # زر التصفح
+        # Browse button
         browse_btn2 = QPushButton('Browse')
         browse_btn2.clicked.connect(lambda: self.browse_file(self.path_input2))
         path_layout.addWidget(browse_btn2)
         
-        # إضافة تخطيط المسار للتخطيط الرئيسي
+        # Add path layout to main layout
         layout.addLayout(path_layout)
         
-        # زر إنشاء الاختصار
-        create_shortcut_btn = QPushButton('إنشاء اختصار في قائمة ابدأ')
+        # Create shortcut button
+        create_shortcut_btn = QPushButton('Create shortcut in start menu')
         create_shortcut_btn.clicked.connect(self.create_wine_shortcut)
         layout.addWidget(create_shortcut_btn)
         
-        # زر التشغيل
+        # Run button
         run_btn2 = QPushButton('Run')
         run_btn2.clicked.connect(lambda: self.run_exe(self.path_input2))
         layout.addWidget(run_btn2)
         
-        # منطقة عرض النتائج
-        self.result_label2 = QLabel('النتائج ستظهر هنا')
+        # Result label
+        self.result_label2 = QLabel('Results will appear here')
         layout.addWidget(self.result_label2)
         
-        # تعيين التخطيط للتبويب الثاني
+        # Set layout for second tab
         self.tab2.setLayout(layout)
     
     def browse_file(self, path_input):
-        # فتح مربع حوار اختيار الملف
+        # Open file dialog
         file_path, _ = QFileDialog.getOpenFileName(
             self, 
-            'اختر ملف EXE', 
+            'Choose EXE file', 
             path_input.text(), 
             'Executable Files (*.exe)'
         )
         
-        # تحديث مساحة الإدخال بالمسار المختار
+        # Update path input with chosen file
         if file_path:
             path_input.setText(file_path)
     
     def create_wine_shortcut(self):
-        # الحصول على المسار من مساحة الإدخال
+        # Get path from path input
         exe_path = self.path_input2.text()
         
         try:
-            # التحقق من وجود الملف
+            # Check if file exists
             if not os.path.exists(exe_path):
-                self.result_label2.setText('خطأ: الملف غير موجود')
+                self.result_label2.setText('Error: File not found')
                 return
             
-            # استخراج اسم البرنامج
+            # Extract program name
             program_name = os.path.splitext(os.path.basename(exe_path))[0]
             
-            # مسار مجلد الاختصارات لـ Wine
+            # Path to start menu
             start_menu_path = os.path.expanduser('~/.local/share/applications')
             os.makedirs(start_menu_path, exist_ok=True)
             
-            # مسار الاختصار الجديد
+            # Path to new shortcut
             shortcut_path = os.path.join(start_menu_path, f'{program_name}_wine.desktop')
             
-            # محتوى ملف الاختصار
+            # Shortcut content
             shortcut_content = f'''[Desktop Entry]
 Name={program_name}
 Exec=wine "{exe_path}"
@@ -224,68 +223,68 @@ Categories=Wine;
 Icon=wine
 '''
             
-            # كتابة الاختصار
+            # Write shortcut
             with open(shortcut_path, 'w') as f:
                 f.write(shortcut_content)
             
-            # جعل الاختصار قابل للتنفيذ
+            # Make shortcut executable
             os.chmod(shortcut_path, 0o755)
             
-            # تحديث قاعدة التطبيقات
+            # Update desktop database
             subprocess.run(['update-desktop-database', start_menu_path], check=True)
             
-            # عرض رسالة نجاح
-            self.result_label2.setText(f'تم إنشاء اختصار للبرنامج: {program_name}')
+            # Show success message
+            self.result_label2.setText(f'Shortcut created for {program_name}')
             
-            # عرض رسالة تأكيد
+            # Show confirmation message
             QMessageBox.information(
                 self, 
-                'نجاح', 
-                f'تم إنشاء اختصار للبرنامج {program_name} في قائمة ابدأ'
+                'Success', 
+                f'Shortcut created for {program_name} in start menu'
             )
         
         except Exception as e:
-            self.result_label2.setText(f'خطأ في إنشاء الاختصار: {str(e)}')
+            self.result_label2.setText(f'Error creating shortcut: {str(e)}')
             
-            # عرض رسالة خطأ
+            # Show error message
             QMessageBox.critical(
                 self, 
-                'خطأ', 
-                f'حدث خطأ أثناء إنشاء الاختصار: {str(e)}'
+                'Error', 
+                f'Error creating shortcut: {str(e)}'
             )
     
     def run_exe(self, path_input):
-        # الحصول على المسار من مساحة الإدخال
+        # Get path from path input
         exe_path = path_input.text()
         
         try:
-            # التحقق من وجود الملف
+            # Check if file exists
             if not os.path.exists(exe_path):
-                # تحديد مربع النتائج المناسب
+                # Determine result label
                 result_label = self.result_label1 if path_input == self.path_input1 else self.result_label2
-                result_label.setText('خطأ: الملف غير موجود')
+                result_label.setText('Error: File not found')
                 return
             
-            # تشغيل الملف باستخدام Wine
+            # Run file using Wine
             result = subprocess.run(
                 ['wine', exe_path], 
                 capture_output=True, 
                 text=True
             )
             
-            # تحديد مربع النتائج المناسب
+            # Determine result label
             result_label = self.result_label1 if path_input == self.path_input1 else self.result_label2
             
-            # عرض النتيجة
+            # Show result
             if result.returncode == 0:
-                result_label.setText('تم التشغيل بنجاح')
+                result_label.setText('Run successfully')
             else:
-                result_label.setText(f'خطأ في التشغيل: {result.stderr}')
+                result_label.setText(f'Error running: {result.stderr}')
         
         except Exception as e:
-            # تحديد مربع النتائج المناسب
+            # Determine result label
             result_label = self.result_label1 if path_input == self.path_input1 else self.result_label2
-            result_label.setText(f'خطأ: {str(e)}')
+            result_label.setText(f'Error: {str(e)}')
 
 def main():
     app = QApplication(sys.argv)
