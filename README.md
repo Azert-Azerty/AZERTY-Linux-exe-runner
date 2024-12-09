@@ -21,7 +21,7 @@ sudo apt-get install wine  # For Debian based systems
 python wine_exe_runner.py
 ```
 
-## advanteges
+## Features
 -Auto-enter path in ~/Downloads
 - Browse button to select EXE files
 - Run button to open files with Wine
