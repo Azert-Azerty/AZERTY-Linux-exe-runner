@@ -22,6 +22,6 @@ python wine_exe_runner.py
 ```
 
 ## Features
--Auto-enter path in ~/Downloads
+- Auto-enter path in ~/Downloads
 - Browse button to select EXE files
 - Run button to open files with Wine
