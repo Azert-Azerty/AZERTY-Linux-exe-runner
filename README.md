@@ -1,27 +1,27 @@
 # Wine EXE Runner
 
-## المتطلبات
+## requirements
 - Python 3.x
 - PyQt5
 - Wine
 
-## التثبيت
-1. قم بتثبيت المتطلبات:
+## installation
+1. use command 
 ```bash
 pip install -r requirements.txt
 ```
 
-2. تأكد من تثبيت Wine:
+2. you should install Wine:
 ```bash
-sudo apt-get install wine  # للأنظمة القائمة على Debian/Ubuntu
+sudo apt-get install wine  # For Debian based systems
 ```
 
-## التشغيل
+## run
 ```bash
 python wine_exe_runner.py
 ```
 
-## الميزات
-- مسار إدخال تلقائي في ~/Downloads
-- زر تصفح لاختيار ملفات EXE
-- زر تشغيل لفتح الملفات باستخدام Wine
+## advanteges
+-Auto-enter path in ~/Downloads
+- Browse button to select EXE files
+- Run button to open files with Wine
